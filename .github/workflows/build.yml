@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
-          path: out/make/*.zip
+          path: eat-what-app/out/make/*.zip
 
   attach-release:
     needs: build-and-release
