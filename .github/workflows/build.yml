@@ -28,7 +28,7 @@ jobs:
         run: npm run make
 
       - name: List output files
-        run: ls -la eat-what-app/out/make
+        run: ls -la out/make/zip
 
       - name: Create GitHub Release
         id: create_release
@@ -40,13 +40,13 @@ jobs:
           name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-          files: out/make/*.zip
+          files: out/make/zip/*.zip
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
-          path: out/make/*.zip
+          path: out/make/zip/*.zip
 
   attach-release:
     needs: build-and-release
@@ -56,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: macos-artifact
-          path: ./out/make/
+          path: ./out/make/zip/
 
       - name: Attach macOS artifact to release
         uses: actions/upload-release-asset@v1
@@ -64,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ needs.build-and-release.outputs.upload_url }}
-          asset_path: ./out/make/*.zip
+          asset_path: ./out/make/zip/*.zip
           asset_name: your-app-name-macos.zip
           asset_content_type: application/zip
