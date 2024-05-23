@@ -28,7 +28,7 @@ jobs:
         run: npm run make
 
       - name: List output files
-        run: ls -la out/make/zip
+        run: ls -la out/make/zip/darwin/arm64
 
       - name: Create GitHub Release
         id: create_release
@@ -40,13 +40,13 @@ jobs:
           name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-          files: out/make/zip/*.zip
+          files: out/make/zip/darwin/arm64/*.zip
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
-          path: out/make/zip/*.zip
+          path: out/make/zip/darwin/arm64/*.zip
 
   attach-release:
     needs: build-and-release
@@ -56,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: macos-artifact
-          path: ./out/make/zip/
+          path: ./out/make/zip/darwin/arm64/
 
       - name: Attach macOS artifact to release
         uses: actions/upload-release-asset@v1
@@ -64,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ needs.build-and-release.outputs.upload_url }}
-          asset_path: ./out/make/zip/*.zip
+          asset_path: ./out/make/zip/darwin/arm64/*.zip
           asset_name: your-app-name-macos.zip
           asset_content_type: application/zip
