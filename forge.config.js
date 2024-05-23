@@ -53,5 +53,9 @@ export default {
         draft: true,
       }
     }
-  ]
+  ],
+  // 设定输出目录
+  output: {
+    directory: 'out/make',
+  },
 };

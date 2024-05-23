@@ -27,6 +27,9 @@ jobs:
       - name: Build Electron app
         run: npm run make
 
+      - name: List output files
+        run: ls -la out/make
+
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -34,15 +37,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+          files: out/make/*.zip
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v2
         with:
           name: macos-artifact
-          path: eat-what-app/out/make/*.zip
+          path: out/make/*.zip
 
   attach-release:
     needs: build-and-release
@@ -52,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: macos-artifact
-          path: ./eat-what-app/out/make/
+          path: ./out/make/
 
       - name: Attach macOS artifact to release
         uses: actions/upload-release-asset@v1
