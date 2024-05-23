@@ -1,8 +1,12 @@
 import { app, BrowserWindow } from 'electron/main'
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-require('dotenv').config();
+if(!process.env.NODE_ENV){
+  
+  const require = createRequire(import.meta.url);
+  
+  require('dotenv').config();
+}
+console.log(process.env.NODE_ENV)
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -10,7 +14,11 @@ const createWindow = () => {
     height: 600
   })
 
-  win.loadFile('./dist/index.html')
+  if(process.env.NODE_ENV === `development`){
+    win.loadURL('http://localhost:5173')
+  }else{
+    win.loadFile('./dist/index.html')
+  }
 }
 
 
