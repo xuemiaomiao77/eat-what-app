@@ -50,7 +50,8 @@ export default {
           name: 'eat-what-app'
         },
         prerelease: false,
-        draft: true
+        draft: true,
+        tag: 'v1.0.0', // 标签名称
       }
     }
   ]
