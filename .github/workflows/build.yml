@@ -52,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: macos-artifact
-          path: ./out/make/
+          path: ./eat-what-app/out/make/
 
       - name: Attach macOS artifact to release
         uses: actions/upload-release-asset@v1
