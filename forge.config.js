@@ -51,7 +51,6 @@ export default {
         },
         prerelease: false,
         draft: true,
-        tag: 'v1.0.0', // 标签名称
       }
     }
   ]
