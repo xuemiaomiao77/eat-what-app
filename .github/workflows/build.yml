@@ -1,71 +1,65 @@
-name: Build/release
+name: Build and Release
 
 on:
-    push:
-      tags:
-        - 'v*.*.*' # 当创建新的版本标签时触发
+  push:
+    tags:
+      - 'v*.*.*' # 当创建新的版本标签时触发
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    # Platforms to build on/for
-    strategy:
-      matrix:
-        os: [macos-latest]
+  build-and-release:
+    runs-on: macos-latest
 
     steps:
-      - name: Check out Git repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Node.js, NPM and Yarn
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 20
+          node-version: 20.x
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install
-      
+
       - name: Build Vue.js app
         run: npm run build
 
-      - name: Package Electron app
+      - name: Build Electron app
         run: npm run make
 
-      - name: Package and Publish Electron app
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        run: npm run make
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
-  release:
-    needs: build
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-artifact
+          path: out/make/*.zip
+
+  attach-release:
+    needs: build-and-release
     runs-on: macos-latest
     steps:
-        - name: Create GitHub Release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          with:
-            tag_name: ${{ github.ref }}
-            release_name: Release ${{ github.ref }}
-            draft: false
-            prerelease: false
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-artifact
+          path: ./out/make/
 
-        - name: Upload macOS artifact
-          id: upload-macos-artifact
-          uses: actions/upload-artifact@v2
-          with:
-            name: macos-artifact
-            path: out/make/*
-
-        - name: Attach macOS artifact to release
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ${{ steps.upload-macos-artifact.outputs.artifact_path }}
-            asset_name: your-app-name-macos.zip
-            asset_content_type: application/zip
- 
+      - name: Attach macOS artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ needs.build-and-release.outputs.upload_url }}
+          asset_path: ./out/make/*.zip
+          asset_name: your-app-name-macos.zip
+          asset_content_type: application/zip
