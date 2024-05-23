@@ -41,19 +41,31 @@ jobs:
     needs: build
     runs-on: macos-latest
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: electron-app
+        - name: Create GitHub Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          with:
+            tag_name: ${{ github.ref }}
+            release_name: Release ${{ github.ref }}
+            draft: false
+            prerelease: false
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-          files: out/**/*.zip
+        - name: Upload macOS artifact
+          id: upload-macos-artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: macos-artifact
+            path: out/make/*
+
+        - name: Attach macOS artifact to release
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ${{ steps.upload-macos-artifact.outputs.artifact_path }}
+            asset_name: your-app-name-macos.zip
+            asset_content_type: application/zip
  
