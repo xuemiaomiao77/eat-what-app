@@ -1,9 +1,12 @@
 name: Build/release
 
-on: push
+on:
+    push:
+      tags:
+        - 'v*.*.*' # 当创建新的版本标签时触发
 
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
 
     # Platforms to build on/for
@@ -23,15 +26,35 @@ jobs:
       - name: Install Dependencies
         run: npm install
       
-      - name: Build Electron App
+      - name: Build Vue.js app
+        run: npm run build
+
+      - name: Package Electron app
         run: npm run make
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      - name: release
-        uses: softprops/action-gh-release@v0.1.14
-        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
         with:
-          files: "out/**"
+          name: electron-app
+          path: out/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: electron-app
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+          files: out/**/*.zip
  
