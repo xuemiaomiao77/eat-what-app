@@ -28,7 +28,7 @@ jobs:
         run: npm run make
 
       - name: List output files
-        run: ls -la out/make
+        run: ls -la eat-what-app/out/make
 
       - name: Create GitHub Release
         id: create_release
