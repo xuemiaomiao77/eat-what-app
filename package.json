@@ -15,6 +15,7 @@
     "start": "NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make:window": "electron-forge make --arch x64 --platform win32",
     "publish": "electron-forge publish"
   },
   "dependencies": {
