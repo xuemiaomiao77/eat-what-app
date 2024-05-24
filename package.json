@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "main": "main.js",
+  "Authors": "xuemiaomiao",
+  "Description": "eat-what-app",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
